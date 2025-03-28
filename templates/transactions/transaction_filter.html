@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block title %}Transaction List{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-lg p-4">
+        <h4 class="text-center mb-4 text-white bg-primary p-3 rounded">
+            Transactions List
+        </h4>
+
+        <!-- Print Button at the Top -->
+        <div class="row mb-4 d-print-none">
+            <div class="col-md-12 text-center">
+                <button onclick="printTransactions()" class="btn btn-success">
+                    <i class="fas fa-print"></i> Print
+                </button>
+            </div>
+        </div>
+
+        <div class="row mb-4 d-print-none">
+            <div class="col-md-6 d-flex justify-content-between">
+                <form method="GET" class="w-100">
+                    <div class="row align-items-center">
+                        <div class="col-md-5 mb-2 mb-md-0">
+                            <input type="date" name="start_date" class="form-control" value="{{ start_date }}" placeholder="Start Date">
+                        </div>
+                        <div class="col-md-5 mb-2 mb-md-0">
+                            <input type="date" name="end_date" class="form-control" value="{{ end_date }}" placeholder="End Date">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">Filter</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-md-6 text-md-right">
+                <a href="{% url 'transaction_filter' %}" class="btn btn-danger">Clear Filter</a>
+            </div>
+        </div>
+
+        {% if date_message %}
+        <div class="alert alert-info d-print-none">
+            {{ date_message }}
+        </div>
+        {% endif %}
+
+        <!-- Printable Section -->
+        <div id="printableArea">
+            <h4 class="text-center mb-4 text-white bg-primary p-3 rounded">
+                Transactions Summary <br>
+                <small id="currentDateTime"></small>
+            </h4>
+
+            <!-- Display Filter Message for Print -->
+            {% if start_date and end_date %}
+            <div class="row mb-3">
+                <div class="col-12 text-center">
+                    <p><strong>Showing results from {{ start_date }} to {{ end_date }}. Total transactions: {{ page_obj.paginator.count }}.</strong></p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Total Income, Expense, Balance Section -->
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <div class="card shadow-sm p-2 text-center">
+                        <h5>Total Income (Income + Borrow)</h5>
+                        <p class="h4 text-success">{{ income }}</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card shadow-sm p-2 text-center">
+                        <h5>Total Expense (Expense + Given)</h5>
+                        <p class="h4 text-danger">{{ expense }}</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card shadow-sm p-2 text-center">
+                        <h5>Available Balance</h5>
+                        <p class="h4">{{ available_balance }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction Table -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped" style="font-size: 14px;">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Type</th>
+                            <th>By</th>
+                            <th>Amount</th>
+                            <th>Description</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in page_obj %}
+                        <tr>
+                            <td>{{ transaction.transaction_id }}</td>
+                            <td>{{ transaction.transaction_type }}</td>
+                            <td>{{ transaction.transaction_by.get_full_name }} ({{ transaction.transaction_by.username }})</td>
+                            <td>{{ transaction.price }}</td>
+                            <td>{{ transaction.description|safe }}</td>
+                            <td>{{ transaction.created_date }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center my-4 d-print-none">
+            <div>
+                <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            </div>
+            <div>
+                <div class="btn-group">
+                    {% if page_obj.has_previous %}
+                    <a href="?page=1&start_date={{ start_date }}&end_date={{ end_date }}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-angle-double-left"></i> First
+                    </a>
+                    <a href="?page={{ page_obj.previous_page_number }}&start_date={{ start_date }}&end_date={{ end_date }}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </a>
+                    {% endif %}
+                    {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}&start_date={{ start_date }}&end_date={{ end_date }}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-chevron-right"></i> Next
+                    </a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}&start_date={{ start_date }}&end_date={{ end_date }}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-angle-double-right"></i> Last
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Print Function Script -->
+<script>
+    function printTransactions() {
+        updateDateTime();
+
+        // Store original body content
+        var originalContent = document.body.innerHTML;
+
+        // Get the printable content and replace the body content with it
+        var printContent = document.getElementById("printableArea").innerHTML;
+        document.body.innerHTML = printContent;
+
+        // Trigger print
+        window.print();
+
+        // Restore the original content after printing
+        document.body.innerHTML = originalContent;
+    }
+
+    function updateDateTime() {
+        let now = new Date();
+        let options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        let formattedDate = now.toLocaleDateString('en-US', options);
+        document.getElementById("currentDateTime").innerText = formattedDate;
+    }
+
+    updateDateTime();
+</script>
+
+{% endblock content %}

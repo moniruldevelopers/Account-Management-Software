@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+
+{% block title %} Home {% endblock title %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg p-4">
+        <div class="d-flex flex-column flex-md-row justify-content-start align-items-center mb-3 no-print">
+            <form method="get" class="d-flex flex-column flex-md-row align-items-center w-100">
+                <!-- "Select Date:" text and date input on the same line -->
+                
+                <input type="date" class="form-control w-100 w-md-auto mb-2 mb-md-0" name="filter_date" id="filterDate" value="{{ selected_date }}" style="max-width: 250px;" />&nbsp
+
+                <!-- Add a gap between the input field and the buttons -->
+                <div class="btn-group flex-column flex-md-row w-100 mt-2 mt-md-0 ml-md-3">
+                    <button type="submit" class="btn btn-primary btn-sm px-3 mb-2 mb-md-0 w-20"><i class="fas fa-filter"></i> Filter</button>
+                    <button type="button" class="btn btn-success btn-sm px-3 mb-2 mb-md-0 w-20" onclick="printTransactions()"><i class="fas fa-print"></i> Print</button>
+                    <button type="button" class="btn btn-secondary btn-sm px-3 mb-2 mb-md-0 w-20" onclick="clearFilter()"><i class="fas fa-times"></i> Clear</button>
+                </div>
+            </form>
+        </div>
+        
+        <div id="printableArea">
+            <h4 class="text-center mb-4 text-white p-3 rounded" style="background: linear-gradient(45deg, #007bff, #6610f2);">
+                Transactions Summary for {{ formatted_date }} <br>
+                <small id="currentDateTime"></small>
+            </h4> 
+            
+            <div id="summarySection">
+                <table class="table table-bordered text-center table-striped table-responsive-sm" style="border-collapse: collapse;">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th colspan="2" style="border: 1px solid black;">Total Income + Borrow</th>
+                            <th colspan="2" style="border: 1px solid black;">Total Expense + Given</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="border: 1px solid black;"><strong>Income</strong></td>
+                            <td style="border: 1px solid black;">{{ total_income|floatformat:2 }} TK</td>
+                            <td style="border: 1px solid black;"><strong>Expense</strong></td>
+                            <td style="border: 1px solid black;">{{ total_expense|floatformat:2 }} TK</td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid black;"><strong>Borrow</strong></td>
+                            <td class="bg-success text-white" style="border: 1px solid black;">{{ total_borrow|floatformat:2 }} TK</td>
+                            <td style="border: 1px solid black;"><strong>Given</strong></td>
+                            <td class="bg-danger text-white" style="border: 1px solid black;">{{ total_given|floatformat:2 }} TK</td>
+                        </tr>
+                        <tr>
+                            <th colspan="2" style="border: 1px solid black;">Available Balance</th>
+                            <th colspan="2" style="border: 1px solid black;">
+                                <span class="p-2 rounded text-white" style="background: {% if available_balance >= 0 %}green{% else %}red{% endif %};">
+                                    {{ available_balance|floatformat:2 }} TK
+                                </span>
+                            </th>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+    
+            <h5 class="mt-4 text-center">Transaction History</h5>
+            <div class="table-responsive">
+                <table class="table table-striped text-center" style="width:100%; border-collapse: collapse;">
+                    <thead>
+                        <tr class="bg-primary text-white">
+                            <th style="border: 1px solid black;">#</th>
+                            <th style="border: 1px solid black;">Transaction ID</th>
+                            <th style="border: 1px solid black;">User</th>
+                            <th style="border: 1px solid black;">Type</th>
+                            <th style="border: 1px solid black;">Amount</th>
+                            <th style="border: 1px solid black;">Description</th>
+                            <th style="border: 1px solid black;">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody style="font-size: 12px;">
+                        {% for transaction in transactions %}
+                        <tr>
+                            <td style="border: 1px solid black;">{{ forloop.counter }}</td>
+                            <td style="border: 1px solid black;">{{ transaction.transaction_id }}</td>
+                            <td style="border: 1px solid black;">{{ transaction.transaction_by.first_name }} {{ transaction.transaction_by.last_name }}</td>
+                            <td class="transaction-type" data-type="{{ transaction.transaction_type }}" style="border: 1px solid black;">
+                                {{ transaction.get_transaction_type_display }}
+                            </td>
+                            <td style="border: 1px solid black;">{{ transaction.price|floatformat:2 }} TK</td>
+                            <td style="border: 1px solid black;">{{ transaction.description|safe|default:"N/A" }}</td>
+                            <td style="border: 1px solid black;">{{ transaction.created_date|date:"F d, Y - h:i A" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center" style="border: 1px solid black;">No transactions recorded for {{ formatted_date }}.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @media print {
+        .no-print {
+            display: none !important;
+        }       
+        #printableArea{
+            width: 100%;
+        }
+        .table{
+            width:100% !important;
+        }
+        body {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        #printableArea h4.rounded {
+            background: linear-gradient(45deg, #007bff, #6610f2) !important;
+        }
+    }
+
+    @media (max-width: 767px) {
+        .table-responsive-sm {
+            -webkit-overflow-scrolling: touch;
+        }
+        .table {
+            font-size: 10px;
+        }
+        .table th, .table td {
+            padding: 8px;
+        }
+
+        .btn-group {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-group .btn {
+            width: 100% !important;
+        }
+        
+        input[type="date"] {
+            max-width: 100%;
+        }
+    }
+
+    /* Larger screen styles */
+    @media (min-width: 768px) {
+        .btn-group {
+            flex-direction: row;
+            gap: 10px;
+        }
+        .btn-group .btn {
+            width: auto !important;
+        }
+        input[type="date"] {
+            max-width: 250px;
+        }
+        .btn-group .btn {
+            width: 20% !important; /* Smaller buttons on desktop */
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".transaction-type").forEach(cell => {
+            let type = cell.getAttribute("data-type").trim().toLowerCase();
+            if (type === "given") {
+                cell.classList.add("bg-danger", "text-white", "font-weight-bold");
+            } else if (type === "borrow") {
+                cell.classList.add("bg-success", "text-white", "font-weight-bold");
+            }
+        });
+    });
+
+    function printTransactions() {
+        updateDateTime();
+        var printContent = document.getElementById("printableArea").innerHTML;
+        var originalContent = document.body.innerHTML;
+        document.body.innerHTML = printContent;
+        window.print();
+        document.body.innerHTML = originalContent;
+        window.location.reload();
+    }
+
+    function clearFilter() {
+        let url = new URL(window.location.href);
+        url.searchParams.delete('filter_date');
+        window.location.href = url.href;
+    }
+
+    function updateDateTime() {
+        let now = new Date();
+        let options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        let formattedDate = now.toLocaleDateString('en-US', options);
+        document.getElementById("currentDateTime").innerText = formattedDate;
+    }
+
+    updateDateTime();
+</script>
+{% endblock %}
