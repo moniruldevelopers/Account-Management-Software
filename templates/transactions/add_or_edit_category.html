@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if category %}
+        Edit Transaction Category: {{ category.name }}
+    {% else %}
+        Add Transaction Category
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-2">
+    {% include 'message.html' %}
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white text-center">
+            <h4>
+                {% if category %}
+                    Edit Category: {{ category.name }}
+                {% else %}
+                    Add New Category
+                {% endif %}
+            </h4>
+        </div>
+        <div class="card-body p-4">
+            <form method="POST" action="{% if category %}{% url 'edit_category' category.id %}{% else %}{% url 'add_category' %}{% endif %}">
+                {% csrf_token %}
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            {{ form|crispy }}
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-success">
+                                {% if category %}Save Changes{% else %}Add Category{% endif %}
+                            </button>
+                            <a href="{% url 'category_list' %}" class="btn btn-outline-secondary">Back to Category List</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,86 +1,145 @@
-<div class="nav">
-    <div class="sb-sidenav-menu-heading">Core</div>
-    <a class="nav-link" href="{% url 'home' %}">
-        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-        Dashboard
-    </a>
-    <a class="nav-link" href="{% url 'add_transaction' %}">
-        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-        Add Transaction
-    </a>
-    <a class="nav-link" href="{% url 'transaction_list' %}">
-        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-        Transaction List
-    </a>
-    <a class="nav-link" href="{% url 'transaction_filter' %}">
-        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-        Transaction Filter
-    </a>
-    <a class="nav-link" href="{% url 'category_summary' %}">
-        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-        Category Summary
-    </a>
-
- 
-    <a class="nav-link" href="{% url 'yearly_balance' %}">
-        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-        Yearly Availabe Balance
-    </a>
-    <a class="nav-link" href="{% url 'yearly_given_borrow' %}">
-        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-        Yearly Given Or Borrow 
-    </a>
-    <div class="sb-sidenav-menu-heading">Interface</div>
-    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
-        <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-        User
-        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-    </a>
-    <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-        <nav class="sb-sidenav-menu-nested nav">
-            <a class="nav-link" href="{% url 'upload_users' %}">Upload Users</a>
-            <a class="nav-link" href="{% url 'user_list' %}">Users List</a>
-            <a class="nav-link" href="{% url 'category_list' %}">Category List</a>
-        </nav>
+<style>
+    /* Style for the navigation links */
+    .nav-link {
+        display: flex;
+        align-items: center;
+        padding: 10px 15px;
+        border-bottom: 1px solid transparent;
+        color: #333;
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+        transition: color 0.3s ease; /* Smooth color transition */
+    }
+    
+    /* Style for the divider */
+    .nav-link::before {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background-color: #ddd;
+        transform: scaleX(0);
+        transform-origin: bottom right;
+        transition: transform 0.3s ease;
+    }
+    
+    /* On hover, the divider and text color will change */
+    .nav-link:hover::before {
+        transform: scaleX(1);
+    }
+    
+    .nav-link:hover {
+        color: #007bff; /* Change text color on hover */
+    }
+    
+    /* Active state - show the divider and change text color without hover */
+    .nav-link.active::before {
+        transform: scaleX(1);
+        background-color: #007bff;
+    }
+    
+    .nav-link.active {
+        color: #007bff; /* Change text color for active state */
+    }
+    
+    /* Remove divider for the last item */
+    .nav-link:last-child {
+        border-bottom: none;
+    }
+    
+    /* Text animation on hover */
+    .nav-link .nav-text {
+        position: relative;
+        transition: transform 0.3s ease;
+    }
+    
+    .nav-link:hover .nav-text {
+        transform: translateX(5px); /* Slight text move on hover */
+    }
+    
+    /* Added a small shadow for depth */
+    .nav-link {
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    </style>
+    
+    <div class="nav">
+        <a class="nav-link" href="{% url 'home' %}">
+            <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+            <span class="nav-text">Dashboard</span>
+        </a>
+        <a class="nav-link" href="{% url 'add_transaction' %}">
+            <div class="sb-nav-link-icon"><i class="fas fa-plus-circle"></i></div>
+            <span class="nav-text">Add Transaction</span>
+        </a>
+        <a class="nav-link" href="{% url 'transaction_list' %}">
+            <div class="sb-nav-link-icon"><i class="fas fa-list"></i></div>
+            <span class="nav-text">Transaction List</span>
+        </a>
+        <a class="nav-link" href="{% url 'transaction_filter' %}">
+            <div class="sb-nav-link-icon"><i class="fas fa-filter"></i></div>
+            <span class="nav-text">Transaction Filter</span>
+        </a>
+        <a class="nav-link" href="{% url 'category_summary' %}">
+            <div class="sb-nav-link-icon"><i class="fas fa-chart-pie"></i></div>
+            <span class="nav-text">Category Summary</span>
+        </a>
+        <a class="nav-link" href="{% url 'category_transactions_filter' %}">
+            <div class="sb-nav-link-icon"><i class="fas fa-filter"></i></div>
+            <span class="nav-text">Category Transactions Filter</span>
+        </a>
+        <a class="nav-link" href="{% url 'yearly_balance' %}">
+            <div class="sb-nav-link-icon"><i class="fas fa-calendar-alt"></i></div>
+            <span class="nav-text">Yearly Available Balance</span>
+        </a>
+        <a class="nav-link" href="{% url 'yearly_given_borrow' %}">
+            <div class="sb-nav-link-icon"><i class="fas fa-hand-holding-usd"></i></div>
+            <span class="nav-text">Yearly Given or Borrowed</span>
+        </a>
+    
+        <div class="sb-sidenav-menu-heading">Interface</div>
+    
+        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
+            <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
+            <span class="nav-text">User</span>
+            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+        </a>
+        <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+            <nav class="sb-sidenav-menu-nested nav">
+                <a class="nav-link" href="{% url 'upload_users' %}"><i class="fas fa-upload"></i> <span class="nav-text">Upload Users</span></a>
+                <a class="nav-link" href="{% url 'user_list' %}"><i class="fas fa-list"></i> <span class="nav-text">Users List</span></a>
+                <a class="nav-link" href="{% url 'category_list' %}"><i class="fas fa-list-alt"></i> <span class="nav-text">Category List</span></a>
+            </nav>
+        </div>
+    
+        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseUser" aria-expanded="false" aria-controls="collapseUser">
+            <div class="sb-nav-link-icon"><i class="fas fa-user-circle"></i></div>
+            <span class="nav-text">
+                {% if request.user.is_authenticated %}
+                    {{ request.user.username }}
+                {% endif %}
+            </span>
+            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+        </a>
+        <div class="collapse" id="collapseUser" aria-labelledby="headingUser" data-bs-parent="#sidenavAccordion">
+            <nav class="sb-sidenav-menu-nested nav">
+                {% if request.user.is_authenticated %}
+                    <a class="nav-link" href="{% url 'change_password' %}">
+                        <i class="fas fa-key"></i> <span class="nav-text">Change Password</span>
+                    </a>
+                    <a class="nav-link" href="{% url 'logout' %}">
+                        <i class="fas fa-sign-out-alt"></i> <span class="nav-text">Logout</span>
+                    </a>
+                {% else %}
+                    <a class="nav-link" href="{% url 'login' %}">
+                        <i class="fas fa-sign-in-alt"></i> <span class="nav-text">Login</span>
+                    </a>
+                {% endif %}
+            </nav>
+            <div style="margin-top: 200px;"></div>
+        </div>
+        
     </div>
-    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
-        <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
-        Pages
-        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-    </a>
-    <div class="collapse" id="collapsePages" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
-        <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
-            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#pagesCollapseAuth" aria-expanded="false" aria-controls="pagesCollapseAuth">
-                Authentication
-                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-            </a>
-            <div class="collapse" id="pagesCollapseAuth" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordionPages">
-                <nav class="sb-sidenav-menu-nested nav">
-                    <a class="nav-link" href="login.html">Login</a>
-                    <a class="nav-link" href="register.html">Register</a>
-                    <a class="nav-link" href="password.html">Forgot Password</a>
-                </nav>
-            </div>
-            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#pagesCollapseError" aria-expanded="false" aria-controls="pagesCollapseError">
-                Error
-                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-            </a>
-            <div class="collapse" id="pagesCollapseError" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordionPages">
-                <nav class="sb-sidenav-menu-nested nav">
-                    <a class="nav-link" href="401.html">401 Page</a>
-                    <a class="nav-link" href="404.html">404 Page</a>
-                    <a class="nav-link" href="500.html">500 Page</a>
-                </nav>
-            </div>
-        </nav>
-    </div>
-    <div class="sb-sidenav-menu-heading">Addons</div>
-    <a class="nav-link" href="charts.html">
-        <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
-        Charts
-    </a>
-    <a class="nav-link" href="tables.html">
-        <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-        Tables
-    </a>
-</div>

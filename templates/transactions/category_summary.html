@@ -3,68 +3,68 @@
 {% block title %}Category Summary{% endblock title %}
 
 {% block content %}
-<div class="container mt-4 ">
+<div class="container mt-2">
+    {% include 'message.html' %}
     <div class="card shadow-lg p-4">
-    <h4 class="text-center mb-4 text-white p-3 rounded" style="background: linear-gradient(45deg, #007bff, #6610f2);">
-        Category Summary
-    </h4>
+        <h4 class="text-center mb-4 text-white p-3 rounded" style="background: linear-gradient(45deg, #007bff, #6610f2);">
+            Category Summary
+        </h4>
 
-    <form method="GET" class="mb-3">
-        <div class="row">
-            <div class="col-md-4">
-                <label for="year" class="form-label">Select Year:</label>
-                <select name="year" id="year" class="form-control">
-                    <option value="">All Years</option>
-                    {% for year in years %}
-                        <option value="{{ year.created_date__year }}" {% if selected_year == year.created_date__year %}selected{% endif %}>{{ year.created_date__year }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="col-md-4">
-                <label for="month" class="form-label">Select Month:</label>
-                <select name="month" id="month" class="form-control">
-                    <option value="">All Months</option>
-                    {% for month in months %}
-                        <option value="{{ month.id }}" {% if selected_month == month.id|stringformat:"s" %}selected{% endif %}>{{ month.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="col-md-4 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary shadow-sm">Filter</button> &nbsp; 
-                <div class="ml-2"></div> <!-- Adding space between buttons -->
-                <a href="{% url 'category_summary' %}" class="btn btn-secondary shadow-sm d-flex align-items-center">
-                    <i class="fas fa-times-circle mr-2"></i> Clear Filter
-                </a>
-            </div>
-        </div>
-    </form>
-
-    <table class="table table-bordered">
-        <thead style="background-color: darkblue; color: white;">
-            <tr>
-                <th>Category</th>
-                <th>Total Income</th>
-                <th>Total Expense</th>
-                <th>Balance</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for data in category_data %}
-            <tr>
-                <td><a href="{% url 'category_transactions' data.category %}" style="text-decoration: none; color: inherit;">
-                        {{ forloop.counter }}.   {{ data.category }}
+        <form method="GET" class="mb-3">
+            <div class="row g-3">
+                <div class="col-md-4 col-12">
+                    <label for="year" class="form-label">Select Year:</label>
+                    <select name="year" id="year" class="form-control">
+                        <option value="">All Years</option>
+                        {% for year in years %}
+                            <option value="{{ year.created_date__year }}" {% if selected_year == year.created_date__year %}selected{% endif %}>{{ year.created_date__year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 col-12">
+                    <label for="month" class="form-label">Select Month:</label>
+                    <select name="month" id="month" class="form-control">
+                        <option value="">All Months</option>
+                        {% for month in months %}
+                            <option value="{{ month.id }}" {% if selected_month == month.id %}selected{% endif %}>{{ month.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 col-12 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary shadow-sm">Filter</button> &nbsp;
+                    <a href="{% url 'category_summary' %}" class="btn btn-secondary shadow-sm d-flex align-items-center">
+                        <i class="fas fa-times-circle mr-2"></i> Clear Filter
                     </a>
-                <td>{{ data.total_income }}</td>
-                <td>{{ data.total_expense }}</td>
-                <td>{{ data.balance }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+                </div>
+            </div>
+        </form>
 
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead style="background-color: darkblue; color: white;">
+                    <tr>
+                        <th>Category</th>
+                        <th>Total Income</th>
+                        <th>Total Expense</th>
+                        <th>Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in category_data %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'category_monthly_transactions' data.category %}?year={{ selected_year }}&month={{ selected_month }}" class="text-decoration-none text-dark">
+                                    {{ forloop.counter }}. {{ data.category }}
+                                </a>
+                            </td>
+                            <td>{{ data.total_income }}</td>
+                            <td>{{ data.total_expense }}</td>
+                            <td>{{ data.balance }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
-
 {% endblock content %}

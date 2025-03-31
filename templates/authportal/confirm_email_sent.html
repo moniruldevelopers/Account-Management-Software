@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+<title>{% block title %} Confirm Email Sent {% endblock title %}</title>
+
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block content %}
+
+{% if messages %}
+    <div class="alert-container mb-2">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div class="container d-flex flex-column justify-content-center align-items-center mt-2 mb-2">
+    <div class="card p-3" style="width: 100%; max-width: 400px;">
+        <div class="d-flex justify-content-center mt-3">
+            <img style="width: 70%; height: 70%;" src="{% static 'assets/img/email_bird.png' %}" alt="Bird Flying with Email" style="width: 100px; height: auto;">
+        </div>
+        <h5 class="text-center" style="color: green;">
+            An email confirmation link has been sent to your Gmail for activation. Please check your inbox.
+        </h5>
+        
+    </div>
+    <a class="btn btn-primary mt-1" href="{% url 'manage_students' %}">Back to Register Student</a>
+</div>
+
+{% endblock content %}

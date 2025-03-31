@@ -1,0 +1,11 @@
+{% autoescape off %}
+
+Hi {{ user.username }},
+
+We have sent you an activation link for your JISC ALUMNI account to your email. Please check your email and click the link below to activate your account:
+
+http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+
+If you did not request this activation, you can simply ignore this email.
+
+{% endautoescape %}

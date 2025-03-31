@@ -1,0 +1,218 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    
+    <style>
+
+.message-container {
+    max-width: 600px; /* Adjust the width as needed */
+    margin: 0 auto; /* Center the container */
+    padding: 5px;
+    border: 1px solid #f44336; /* Border color for error messages */
+    background-color: #fdd; /* Light red background */
+    border-radius: 5px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.message-list {
+    list-style-type: none; /* Remove bullet points */
+    padding: 0;
+    margin: 0;
+}
+
+.message-item {
+    color: #f44336; /* Red text color for error messages */
+    padding: 5px 0; /* Vertical padding */
+    border-bottom: 1px solid #f44336; /* Border between messages */
+}
+
+.message-item:last-child {
+    border-bottom: none; /* Remove border from last message */
+}
+
+        .login-background {
+            background: url("{% static 'assets/img/jisc.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .login-background::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            background-color: rgba(255, 255, 255, 0.87); /* Semi-transparent background */
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            text-align: center;
+            margin: 5px auto;
+            z-index: 2;
+        }
+        .login-header {
+            background-color: #001f7f;
+            color: white;
+            padding: 10px;
+            border-radius: 15px 15px 10px 10px;
+        }
+        .login-header img {
+            width: 80px;
+            margin-bottom: 5px;
+        }
+        .login-header h4 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        .login-header p {
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        .contact-info {
+            font-size: 12px;
+            
+        }
+        .login-form {
+            padding: 20px;
+        }
+        .login-form .form-control {
+            margin-bottom: 15px;
+            border-radius: 25px;
+            padding: 10px 20px;
+        }
+        .login-form .form-control:focus {
+            box-shadow: 0 0 5px rgba(0, 31, 127, 0.5);
+            border-color: #001f7f;
+        }
+        .login-form .btn-primary {
+            border-radius: 25px;
+            padding: 10px 30px;
+            background-color: #001f7f;
+            border: none;
+            transition: background-color 0.3s ease-in-out;
+        }
+        .login-form .btn-primary:hover {
+            background-color: #00134f;
+        }
+        .social-icons {
+            margin-top: 5px;
+        }
+        .social-icons a {
+            margin: 0 10px;
+            font-size: 24px;
+           
+        }
+       
+        .social-icons a.facebook {
+            color: #4267B2;
+        }
+        .social-icons a.instagram {
+            color: #E1306C;
+        }
+        .social-icons a.youtube {
+            color: #FF0000;
+        }
+        .social-icons a.linkedin {
+            color: #0077B5;
+        }
+
+
+
+/* Container for social icons */
+
+
+.social-icons a {
+    display: inline-block;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for zoom and shadow */
+}
+
+.social-icons a:hover {
+    transform: scale(1.2); /* Zoom effect */
+   
+}
+
+</style>
+</head>
+<body>
+    <div class="login-background">
+        <div class="login-container">
+            {% include 'message.html' %}
+            <div class="login-header">
+                <img src="{% static 'assets/img/jisc.png' %}" alt="School Logo">
+                <h4>Jahanara Israil School & College</h4>
+                <p><i class="fa-solid fa-location-dot"></i> 999 College Row, Barishal 8200</p>            
+                    <p><i class="fa-solid fa-envelope"></i> jiscollege2010@gmail.com <i class="fa-solid fa-phone"></i> 01751-505090 </p>
+                
+            </div>
+            <div class="login-form">
+                <h5 class="mb-4">Log In <i class="fas fa-lock"></i></h5>            
+                <form id="login-form" action=""method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        {{ form.username.errors }}
+                        <input type="text" name="username" class="form-control" placeholder="JISC ID"required>
+                    </div>
+                    <div class="form-group">
+                        {{ form.password.errors }}
+                        <input type="password" name="password" class="form-control" placeholder="Password" required>
+                    </div>
+                
+                    <div class="d-flex justify-content-between">
+                        <button id="login-button" type="submit" class="btn btn-primary w-100">Log In
+                            <span id="spinner" class="spinner-border spinner-border-sm ml-2" role="status" aria-hidden="true" style="display:none;"></span>
+                        </button>
+                    </div>
+
+                </form> 
+                <br>
+                {% if messages %}
+                <div class="message-container">
+                <ul class="message-list">
+                {% for message in messages %}
+                <li class="message-item">{{ message }}</li>
+                {% endfor %}
+                </ul>
+                </div>
+                {% endif %}           
+            </div>
+            
+         
+            <div class="social-icons">
+                <a href="#" class="facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="youtube"><i class="fab fa-youtube"></i></a>
+                <a href="#" class="linkedin"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+         
+        </div>
+    </div>
+
+
+<script>
+document.getElementById('login-form').addEventListener('submit', function() {
+    document.getElementById('spinner').style.display = 'inline-block';
+    document.getElementById('login-button').disabled = true;
+});
+</script>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -27,11 +27,16 @@ urlpatterns = [
 
     # category
     path('category-summary/', category_summary, name='category_summary'),
-    path('category-transactions/<str:category_name>/', category_transactions, name='category_transactions'),
+    path('category_transactions_filter/', category_transactions_filter, name='category_transactions_filter'),
+     path('category_monthly_transactions/<str:category_name>/', category_monthly_transactions, name='category_monthly_transactions'),
     path('categories/', category_list, name='category_list'),   
-    path('edit-category/<int:category_id>/', edit_transaction_category, name='edit_category'),
+    path('category/add/', add_or_edit_transaction_category, name='add_category'),
+    path('category/edit/<int:category_id>/', add_or_edit_transaction_category, name='edit_category'),
 
     path('transactions-filter/', transaction_filter, name='transaction_filter'),
+
+    path('user_profile/<str:username>/', user_profile, name='user_profile'),
+    path('search-user/', search_user, name='search_user'),
 
 
 

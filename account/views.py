@@ -23,10 +23,13 @@ from openpyxl.styles import Font
 from io import BytesIO
 from django.http import HttpResponse
 from datetime import datetime
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib.admin.models import LogEntry
+from django.utils.safestring import mark_safe
 
 
-
-
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
 def upload_users(request):
     if request.method == 'POST':
         form = UploadExcelForm(request.POST, request.FILES)
@@ -78,6 +81,7 @@ def upload_users(request):
 
 
 
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
 def home(request):
     # Get Bangladesh timezone
     bd_timezone = pytz.timezone("Asia/Dhaka")
@@ -121,7 +125,7 @@ def home(request):
     return render(request, 'home.html', context)
 
 
-
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
 def add_edit_transaction(request, transaction_id=None):
     transaction = None
 
@@ -131,7 +135,14 @@ def add_edit_transaction(request, transaction_id=None):
     if request.method == "POST":
         form = TransactionForm(request.POST, instance=transaction)
         if form.is_valid():
-            saved_transaction = form.save()
+            saved_transaction = form.save(commit=False)
+
+            # Assign created_by only if it's a new transaction
+            if not saved_transaction.created_by:
+                saved_transaction.created_by = request.user  
+
+            saved_transaction.save()
+
             user_full_name = saved_transaction.transaction_by.get_full_name() or saved_transaction.transaction_by.username
             messages.success(request, f"Transaction added successfully for {user_full_name}!")
 
@@ -146,12 +157,12 @@ def add_edit_transaction(request, transaction_id=None):
 
     return render(request, 'transactions/add_transaction.html', {'form': form, 'transaction': transaction})
 
-
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
 def transaction_print(request, transaction_id):
     transaction = get_object_or_404(Transaction, id=transaction_id)
     return render(request, 'transactions/transaction_print.html', {'transaction': transaction})
 
-
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
 def transaction_list(request):
     search_query = request.GET.get('search', '')
 
@@ -188,7 +199,7 @@ def transaction_list(request):
 
     return render(request, 'transactions/transaction_list.html', context)
 
-
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
 def delete_transaction(request, transaction_id):
     transaction = get_object_or_404(Transaction, id=transaction_id)
     
@@ -204,7 +215,7 @@ def delete_transaction(request, transaction_id):
     # Redirect to the transaction list page
     return redirect('transaction_list')
 
-
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
 def user_list(request):
     query = request.GET.get('q', '')
 
@@ -237,7 +248,7 @@ def user_list(request):
 
     return render(request, 'user/user_list.html', context)
 
-
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
 def edit_user(request, user_id):
     user = get_object_or_404(User, id=user_id)
     profile, created = Profile.objects.get_or_create(user=user)
@@ -256,12 +267,15 @@ def edit_user(request, user_id):
 
     return render(request, 'user/edit_user.html', {'user': user, 'form': form})
 
+
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
 def delete_user(request, user_id):
     user = get_object_or_404(User, id=user_id)
     user.delete()
     messages.success(request, 'User deleted successfully!')
     return redirect('user_list')
 
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
 def reset_password(request, user_id):
     user = get_object_or_404(User, id=user_id)
     new_password = user.username  # Reset password to default (username)
@@ -270,7 +284,7 @@ def reset_password(request, user_id):
     messages.success(request, f'Password reset successfully! New password: {new_password}')
     return redirect('user_list')
 
-
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
 def yearly_balance(request):
     # Get available years dynamically from the transactions
     available_years = Transaction.objects.dates('created_date', 'year', order='DESC').distinct()
@@ -339,7 +353,7 @@ def yearly_balance(request):
 
     return render(request, 'transactions/yearly_balance.html', context)
 
-
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
 def yearly_given_borrow(request):
     # Get available years dynamically
     available_years = Transaction.objects.filter(transaction_type__in=['given', 'borrow']).dates('created_date', 'year', order='DESC').distinct()
@@ -376,7 +390,7 @@ def yearly_given_borrow(request):
 
 
 
-
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
 def category_summary(request):
     categories = TransactionCategory.objects.all()
     category_data = []
@@ -389,15 +403,18 @@ def category_summary(request):
     transactions = Transaction.objects.all()
 
     # Convert to integers for comparison
-    selected_year = int(selected_year) if selected_year else current_datetime.year
-    selected_month = int(selected_month) if selected_month else current_datetime.month
+    try:
+        selected_year = int(selected_year)
+    except ValueError:
+        selected_year = current_datetime.year
+
+    try:
+        selected_month = int(selected_month)
+    except ValueError:
+        selected_month = current_datetime.month
 
     # Filter transactions based on created_date's year and month
-    if selected_year:
-        transactions = transactions.filter(created_date__year=selected_year)
-
-    if selected_month:
-        transactions = transactions.filter(created_date__month=selected_month)
+    transactions = transactions.filter(created_date__year=selected_year, created_date__month=selected_month)
 
     for category in categories:
         total_income = transactions.filter(category=category, transaction_type='income').aggregate(total=Sum('price'))['total'] or 0
@@ -418,6 +435,15 @@ def category_summary(request):
     # Prepare months
     months = [{'id': i, 'name': datetime(1900, i, 1).strftime('%B')} for i in range(1, 13)]
 
+    #Add success message
+    month_name = ""
+    for month in months:
+        if month['id'] == selected_month:
+            month_name = month['name']
+            break;
+
+    messages.success(request, f"Summary for {month_name}, {selected_year}.")
+
     return render(request, 'transactions/category_summary.html', {
         'category_data': category_data,
         'years': years,
@@ -426,66 +452,152 @@ def category_summary(request):
         'selected_month': selected_month,
     })
 
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
+def category_monthly_transactions(request, category_name):
+    # Get year and month from request, default to current year and month
+    current_datetime = datetime.now()
+    selected_year = request.GET.get('year', str(current_datetime.year))
+    selected_month = request.GET.get('month', str(current_datetime.month))
 
+    try:
+        selected_year = int(selected_year)
+    except ValueError:
+        selected_year = current_datetime.year
 
+    try:
+        selected_month = int(selected_month)
+    except ValueError:
+        selected_month = current_datetime.month
 
-def category_transactions(request, category_name):
-    # Fetch all transactions for the selected category
-    category = TransactionCategory.objects.get(name=category_name)
-    transactions = Transaction.objects.filter(category=category)
+    category = get_object_or_404(TransactionCategory, name=category_name)
+    transactions = Transaction.objects.filter(
+        category=category,
+        created_date__year=selected_year,
+        created_date__month=selected_month,
+    )
+
     total_transactions = transactions.count()
 
-    paginator = Paginator(transactions, 10)  # Show 10 transactions per page
+    paginator = Paginator(transactions, 300)  # Show 10 transactions per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
     # Export to Excel functionality
     if request.GET.get('export') == 'true':
-        # Create a workbook and sheet
         wb = Workbook()
         ws = wb.active
         ws.title = 'Transactions'
 
-        # Define headers
         headers = ['Transaction ID', 'Transaction Type', 'Full Name', 'Price', 'Description', 'Date']
         ws.append(headers)
-        
-        # Apply bold style to headers
+
         for cell in ws[1]:
             cell.font = Font(bold=True)
 
-        # Populate sheet with transaction data
         for transaction in transactions:
             created_date = transaction.created_date
-            # Remove timezone information if it exists
             if created_date.tzinfo is not None:
                 created_date = created_date.replace(tzinfo=None)
 
-            # Ensure data is placed in the correct columns:
             ws.append([
-                transaction.transaction_id,  # Transaction ID
-                transaction.transaction_type,  # Transaction Type
-                f"{transaction.transaction_by.get_full_name()} ({transaction.transaction_by.username})",  # Full Name
-                transaction.price,  # Price
-                transaction.description,  # Description
-                created_date,  # Date (timezone-free)
+                transaction.transaction_id,
+                transaction.transaction_type,
+                f"{transaction.transaction_by.get_full_name()} ({transaction.transaction_by.username})",
+                transaction.price,
+                transaction.description,
+                created_date,
             ])
 
-        # Generate the filename in the format: "Month_CategoryName_Year.xlsx"
-        current_datetime = datetime.now()
-        selected_month = current_datetime.strftime('%B')  # Full month name
-        selected_year = current_datetime.year
+        excel_month = datetime(1900, selected_month, 1).strftime('%B')
+        filename = f"{excel_month}_{category_name}_{selected_year}.xlsx"
 
-        filename = f"{selected_month}_{category_name}_{selected_year}.xlsx"
-
-        # Set the response to be a downloadable Excel file
         response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         response['Content-Disposition'] = f'attachment; filename={filename}'
         wb.save(response)
         return response
 
-    return render(request, 'transactions/category_transactions.html', {
+    return render(request, 'transactions/category_monthly_transactions.html', {
         'category': category_name,
+        'page_obj': page_obj,
+        'total_transactions': total_transactions,
+        'selected_year': selected_year,
+        'selected_month': selected_month,
+    })
+
+
+
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
+def category_transactions_filter(request):
+    categories = TransactionCategory.objects.all()  # Get all categories for selection
+    selected_category_name = request.GET.get('category')
+    start_date_str = request.GET.get('start_date')
+    end_date_str = request.GET.get('end_date')
+
+    transactions = Transaction.objects.none()  # Default to empty queryset
+
+    if selected_category_name and start_date_str and end_date_str:
+        try:
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+            selected_category = get_object_or_404(TransactionCategory, name=selected_category_name)
+            transactions = Transaction.objects.filter(
+                category=selected_category,
+                created_date__date__range=[start_date, end_date],
+            )
+
+            # Calculate the number of days between start and end date
+            delta = end_date - start_date
+            total_days = delta.days + 1  # Include both start and end dates
+
+            messages.success(request, f"Transactions filtered from {start_date} to {end_date} ({total_days} days).")
+
+        except (ValueError, TransactionCategory.DoesNotExist):
+            # Handle invalid date formats or category not found
+            messages.error(request, "Invalid date format or category not found.") #Added error message
+            pass  # Keep transactions as empty queryset
+
+    total_transactions = transactions.count()
+    paginator = Paginator(transactions, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    if request.GET.get('export') == 'true' and transactions:
+        wb = Workbook()
+        ws = wb.active
+        ws.title = 'Transactions'
+
+        headers = ['Transaction ID', 'Transaction Type', 'Full Name', 'Price', 'Description', 'Date']
+        ws.append(headers)
+
+        for cell in ws[1]:
+            cell.font = Font(bold=True)
+
+        for transaction in transactions:
+            created_date = transaction.created_date
+            if created_date.tzinfo is not None:
+                created_date = created_date.replace(tzinfo=None)
+
+            ws.append([
+                transaction.transaction_id,
+                transaction.transaction_type,
+                f"{transaction.transaction_by.get_full_name()} ({transaction.transaction_by.username})",
+                transaction.price,
+                transaction.description,
+                created_date,
+            ])
+
+        filename = f"Transactions_{selected_category_name}_{start_date_str}_{end_date_str}.xlsx" if selected_category_name and start_date_str and end_date_str else "Transactions.xlsx"
+
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = f'attachment; filename={filename}'
+        wb.save(response)
+        return response
+
+    return render(request, 'transactions/category_transactions_filter.html', {
+        'categories': categories,
+        'selected_category_name': selected_category_name,
+        'start_date_str': start_date_str,
+        'end_date_str': end_date_str,
         'page_obj': page_obj,
         'total_transactions': total_transactions,
     })
@@ -493,29 +605,40 @@ def category_transactions(request, category_name):
 
 
 
+
+
+
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
 def category_list(request):
     categories = TransactionCategory.objects.all()
     return render(request, 'transactions/category_list.html', {'categories': categories})
 
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
+def add_or_edit_transaction_category(request, category_id=None):
+    # If category_id is provided, it's an edit; otherwise, it's an add
+    if category_id:
+        category = get_object_or_404(TransactionCategory, id=category_id)
+    else:
+        category = None
 
-def edit_transaction_category(request, category_id):
-    # Fetch the transaction category by ID
-    category = get_object_or_404(TransactionCategory, id=category_id)
-    
     if request.method == 'POST':
-        # Handle the form submission to update the category
+        # Handle the form submission to add or update the category
         form = TransactionCategoryForm(request.POST, instance=category)
         if form.is_valid():
             form.save()
-            return redirect('category_list')  # Redirect to the category list or another page after saving
+            return redirect('category_list')  # Redirect to the category list after saving
     else:
-        # For GET requests, show the existing category data in the form
+        # For GET requests, show the existing category data in the form or an empty form
         form = TransactionCategoryForm(instance=category)
 
-    return render(request, 'transactions/edit_category.html', {'form': form, 'category': category})
+    return render(request, 'transactions/add_or_edit_category.html', {'form': form, 'category': category})
 
 
 
+
+
+
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
 def transaction_filter(request):
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
@@ -570,3 +693,82 @@ def transaction_filter(request):
     }
 
     return render(request, 'transactions/transaction_filter.html', context)
+
+
+
+def user_profile(request, username):
+    user = get_object_or_404(User, username=username)
+    profile = get_object_or_404(Profile, user=user)
+    transactions = Transaction.objects.filter(transaction_by=user).order_by('-created_date')
+
+    if request.GET.get('export') == 'true':
+        return export_transactions_to_excel(user, transactions)
+
+    paginator = Paginator(transactions, 300)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'transactions/user_profile.html', {
+        'user': user,
+        'profile': profile,
+        'page_obj': page_obj,
+    })
+
+def search_user(request):
+    query = request.GET.get('q', '').strip()
+
+    if not query:
+        return render(request, 'transactions/user_not_found.html')
+
+    try:
+        user = User.objects.get(username=query)
+    except User.DoesNotExist:
+        return render(request, 'transactions/user_not_found.html')
+
+    transactions = Transaction.objects.filter(transaction_by=user).order_by('-created_date')
+
+    if request.GET.get('export') == 'true':
+        return export_transactions_to_excel(user, transactions)
+
+    return render(request, 'transactions/user_profile.html', {
+        'user': user,
+        'profile': user.profile,
+        'page_obj': transactions,
+    })
+
+
+def export_transactions_to_excel(user, transactions):
+    wb = Workbook()
+    ws = wb.active
+    ws.title = f"{user.username}_Transactions"
+
+    headers = ['Transaction ID', 'Type', 'Category', 'Price', 'Description', 'Date', 'Created By']
+    ws.append(headers)
+
+    for cell in ws[1]:
+        cell.font = Font(bold=True)
+
+    for transaction in transactions:
+        created_date = transaction.created_date.strftime('%Y-%m-%d')
+
+        ws.append([
+            transaction.transaction_id,
+            transaction.transaction_type,
+            transaction.category.name if transaction.category else 'N/A',
+            transaction.price,
+            transaction.description,
+            created_date,
+            f"{transaction.created_by.username} ({transaction.created_by.get_full_name()})" if transaction.created_by else "System"
+        ])
+
+    full_name = user.get_full_name().replace(" ", "_") if user.get_full_name() else user.username
+    filename = f"{full_name}_{user.username}_transactions.xlsx"
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename={filename}'
+    
+    wb.save(response)
+    return response
+
+
+

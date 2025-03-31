@@ -4,7 +4,7 @@
 {% block title %} View Transactions {% endblock title %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-2">
     <div class="card shadow-lg p-4">
         <h4 class="text-center mb-4 text-white p-3 rounded" style="background: linear-gradient(45deg, #007bff, #6610f2);">
             All Transactions List
@@ -62,7 +62,8 @@
                     {% for transaction in transactions %}
                     <tr id="transaction-{{ transaction.id }}">
                         <td>{{ transaction.transaction_id }}</td>
-                        <td>{{ transaction.transaction_by.username }}</td>
+                        <td><a style="text-decoration: none;" href="{% url 'user_profile' username=transaction.transaction_by.username %}">{{ transaction.transaction_by.username }}</a></td>
+
                         <td>{{ transaction.transaction_by.first_name }} {{ transaction.transaction_by.last_name }}</td>
                         <td>{{ transaction.category.name }}</td>
                         <td class="transaction-type" data-type="{{ transaction.get_transaction_type_display }}">

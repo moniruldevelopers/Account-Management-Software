@@ -24,6 +24,8 @@ class TransactionCategory(models.Model):
     def __str__(self):
         return self.name
 
+
+
 class Transaction(models.Model):
     transaction_id = models.CharField(max_length=20, unique=True, editable=False)
     transaction_by = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -43,7 +45,7 @@ class Transaction(models.Model):
     invoice_id = models.CharField(max_length=15, null=True, blank=True)
     invoice_date = models.DateField(null=True, blank=True)
     check_no = models.CharField(max_length=15, null=True, blank=True)
-    
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="created_transactions")    
     created_date = models.DateTimeField(auto_now_add=True)
     
     def save(self, *args, **kwargs):
