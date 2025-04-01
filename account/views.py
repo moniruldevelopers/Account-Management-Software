@@ -252,12 +252,12 @@ def user_list(request):
     regular_users = users.filter(is_staff=False, is_superuser=False)
 
     # Pagination for all users
-    paginator = Paginator(users, 10)
+    paginator = Paginator(users, 500)
     page_number = request.GET.get('page')
     users_page = paginator.get_page(page_number)
 
     # Separate pagination for regular users
-    regular_paginator = Paginator(regular_users, 10)
+    regular_paginator = Paginator(regular_users, 1000)
     regular_page_number = request.GET.get('regular_page')
     regular_users_page = regular_paginator.get_page(regular_page_number)
 

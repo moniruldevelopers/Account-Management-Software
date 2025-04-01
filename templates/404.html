@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            color: #fff;
+        }
+        .error-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            border: 2px solid transparent;
+            animation: gradient-border 2s infinite alternate;
+            position: relative;
+            max-width: 500px;
+        }
+        @keyframes gradient-border {
+            0% {
+                border-color: #ff416c;
+                box-shadow: 0 0 15px #ff416c;
+            }
+            100% {
+                border-color: #ff4b2b;
+                box-shadow: 0 0 25px #ff4b2b;
+            }
+        }
+        .error-icon {
+            font-size: 100px;
+            color: #ff416c;
+            animation: bounce 1.5s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .btn-custom {
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            border: none;
+            padding: 12px 25px;
+            font-size: 18px;
+            border-radius: 30px;
+            color: white;
+            transition: 0.3s;
+        }
+        .btn-custom:hover {
+            background: linear-gradient(135deg, #ff4b2b, #ff416c);
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="error-container">
+        <i class="fas fa-exclamation-circle error-icon"></i>
+        <h1 class="display-3 fw-bold">404</h1>
+        <h2 class="text-light">Oops! Page Not Found</h2>
+        <p class="lead">Sorry, the page you're looking for doesn't exist or has been moved.</p>
+        <a href="/" class="btn btn-custom"><i class="fas fa-home"></i> Back to Home</a>
+    </div>
+
+</body>
+</html>
