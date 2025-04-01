@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-2">
+    <div class="card shadow-lg p-4">
+        <h4 class="mb-3 text-darkblue">Book List</h4>
+
+        <!-- Total Books & Total Quantity -->
+        <p class="text-muted">
+            <strong>Total Books:</strong> {{ total_books }} |
+            <strong>Total Quantity:</strong> {{ total_quantity }}
+        </p>
+
+        <!-- Export Button -->
+        <a href="{% url 'export_books' %}" class="btn btn-success mb-3">
+            <i class="fas fa-file-excel"></i> Export to Excel
+        </a>
+
+        <!-- Responsive Table -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Book Name</th>
+                        <th>Writer</th>
+                        <th>Publication</th>
+                        <th>Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for book in page_obj %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ book.name }}</td>
+                            <td>{{ book.writer|default:"Unknown" }}</td>
+                            <td>{{ book.publication|default:"Unknown" }}</td>
+                            <td>{{ book.quantity }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">No books available</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Include Pagination -->
+        {% include 'pagination.html' %}
+    </div>
+</div>
+{% endblock %}

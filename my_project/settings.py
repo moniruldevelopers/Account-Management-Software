@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     # my apps
     'account',
     'authportal',
+    'jisc_library',
         # third-party apps
     'django_cleanup.apps.CleanupConfig', 
     'crispy_forms',

@@ -80,6 +80,31 @@ def upload_users(request):
     return render(request, 'user/upload_users.html', {'form': form})
 
 
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
+def download_upload_format(request):
+    # Prepare data for the format (you can just create an empty or template row to download)
+    data = {
+        'id': [''],
+        'full name': [''],
+        'phone number': [''],
+        'email': [''],
+    }
+
+    # Create a DataFrame with the template
+    df = pd.DataFrame(data)
+
+    # Generate Excel response
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=upload_format.xlsx'
+
+    # Save the DataFrame to Excel in memory
+    with pd.ExcelWriter(response, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Users')
+
+    return response
+
+
+
 
 @user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
 def home(request):
@@ -695,7 +720,7 @@ def transaction_filter(request):
     return render(request, 'transactions/transaction_filter.html', context)
 
 
-
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
 def user_profile(request, username):
     user = get_object_or_404(User, username=username)
     profile = get_object_or_404(Profile, user=user)
@@ -713,7 +738,7 @@ def user_profile(request, username):
         'profile': profile,
         'page_obj': page_obj,
     })
-
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
 def search_user(request):
     query = request.GET.get('q', '').strip()
 
@@ -736,7 +761,7 @@ def search_user(request):
         'page_obj': transactions,
     })
 
-
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
 def export_transactions_to_excel(user, transactions):
     wb = Workbook()
     ws = wb.active

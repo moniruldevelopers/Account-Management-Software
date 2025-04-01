@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} Add Library Record {% endblock title %}
+
+{% block content %}
+<div class="container mt-2">
+    {% include 'message.html' %}
+    <div class="card shadow-lg p-4">
+        <h4 class="text-center mb-4 p-3 rounded" style="background: linear-gradient(45deg, #007bff, #6610f2); color: white;">
+            Add Library Record
+        </h4>
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="row">
+                <!-- Column 1 -->
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="id_user">User <span class="text-danger">*</span></label>
+                        {{ form.user }}
+                    </div>
+                </div>
+
+                <!-- Column 2 -->
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="id_book">Book <span class="text-danger">*</span></label>
+                        {{ form.book }}
+                    </div>
+                </div>
+
+                <!-- Column 3 -->
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="id_shelf_no">Shelf No</label>
+                        {{ form.shelf_no }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Column 1 -->
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="id_row_no">Row No</label>
+                        {{ form.row_no }}
+                    </div>
+                </div>
+
+                <!-- Column 2 -->
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="id_issue_date">Issue Date <span class="text-danger">*</span></label>
+                        {{ form.issue_date }}
+                    </div>
+                </div>
+
+                <!-- Column 3 -->
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="id_returned_date">Returned Date</label>
+                        {{ form.returned_date }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Column 1 -->
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="id_status">Status</label>
+                        {{ form.status }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <button type="submit" class="btn btn-primary w-100">Add Record</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Include jQuery & Select2 for searchable dropdowns -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // Apply Select2 to user and book fields
+        $('#id_user').select2({
+            width: '100%',
+            placeholder: "Search for a user",
+            allowClear: true
+        });
+
+        $('#id_book').select2({
+            width: '100%',
+            placeholder: "Search for a book",
+            allowClear: true
+        });
+    });
+</script>
+
+<style>
+    .card {
+        border-radius: 10px;
+    }
+
+    .form-group label {
+        font-weight: bold;
+    }
+
+    /* Apply a bit of spacing and border radius */
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .select2-container {
+        width: 100% !important; /* Ensures select2 fits within column */
+    }
+
+    .form-control {
+        border-radius: 5px;
+    }
+</style>
+
+{% endblock content %}

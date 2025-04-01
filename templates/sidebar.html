@@ -9,7 +9,7 @@
         text-decoration: none;
         position: relative;
         overflow: hidden;
-        transition: color 0.3s ease; /* Smooth color transition */
+        transition: color 0.3s ease, background-color 0.3s ease; /* Added background-color transition */
     }
     
     /* Style for the divider */
@@ -33,6 +33,7 @@
     
     .nav-link:hover {
         color: #007bff; /* Change text color on hover */
+        background-color: rgba(0, 123, 255, 0.1); /* Light blue background on hover */
     }
     
     /* Active state - show the divider and change text color without hover */
@@ -43,6 +44,7 @@
     
     .nav-link.active {
         color: #007bff; /* Change text color for active state */
+        background-color: rgba(0, 123, 255, 0.2); /* Slightly darker blue background when active */
     }
     
     /* Remove divider for the last item */
@@ -65,7 +67,6 @@
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
     </style>
-    
     <div class="nav">
         <a class="nav-link" href="{% url 'home' %}">
             <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
@@ -114,8 +115,24 @@
                 <a class="nav-link" href="{% url 'category_list' %}"><i class="fas fa-list-alt"></i> <span class="nav-text">Category List</span></a>
             </nav>
         </div>
-    
-        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseUser" aria-expanded="false" aria-controls="collapseUser">
+
+
+        <div class="sb-sidenav-menu-heading">Library</div>
+
+<a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLibrary" aria-expanded="false" aria-controls="collapseLibrary">
+    <div class="sb-nav-link-icon"><i class="fas fa-book"></i></div>
+    <span class="nav-text">Library Management</span>
+    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+</a>
+
+<div class="collapse" id="collapseLibrary" aria-labelledby="headingLibrary" data-bs-parent="#sidenavAccordion">
+    <nav class="sb-sidenav-menu-nested nav">
+        <a class="nav-link" href="{% url 'book_upload' %}"><i class="fas fa-upload"></i> <span class="nav-text">Upload Books</span></a>
+        <a class="nav-link" href="{% url 'book_list' %}"><i class="fas fa-list"></i> <span class="nav-text">Book List</span></a>
+        <a class="nav-link" href="{% url 'libraryrecord_list' %}"><i class="fas fa-hand-holding"></i> <span class="nav-text">Issue Book</span></a>
+    </nav>
+</div>
+         <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseUser" aria-expanded="false" aria-controls="collapseUser">
             <div class="sb-nav-link-icon"><i class="fas fa-user-circle"></i></div>
             <span class="nav-text">
                 {% if request.user.is_authenticated %}
@@ -139,7 +156,9 @@
                     </a>
                 {% endif %}
             </nav>
-            <div style="margin-top: 200px;"></div>
+           
         </div>
         
     </div>
+
+    <div style="margin-top: 200px;"></div>

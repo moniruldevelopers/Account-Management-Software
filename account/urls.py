@@ -5,6 +5,7 @@ from .views import *
 urlpatterns = [
 
     path('upload-users/', upload_users, name='upload_users'),
+    path('download-upload-format/', download_upload_format, name='download_upload_format'),
     path('', home, name='home'),
     path('transactions/', transaction_list, name='transaction_list'),
     path('add-transaction/', add_edit_transaction, name='add_transaction'),  # Used for both Add/Edit
