@@ -809,6 +809,7 @@ def office_item_create_or_update(request, office_item_id=None):
 
     if form.is_valid():
         form.save()
+        messages.success(request, "Item added Successfully")       
         return redirect('office_item_list')  # Replace with your actual list view URL name
 
     return render(request, 'office_item/office_item_form.html', {'form': form})
@@ -818,7 +819,7 @@ def office_item_create_or_update(request, office_item_id=None):
 
 @user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
 def office_item_list(request):
-    items = OfficeItem.objects.all()  # Fetch all office items
+    items = OfficeItem.objects.all()  # Fetch all office items   
     return render(request, 'office_item/office_item_list.html', {'items': items})
 
 
@@ -835,6 +836,7 @@ def borrow_create_or_update(request, borrow_id=None):
         borrow_management = form.save(commit=False)
         borrow_management.created_by = request.user  # Set the user who created/updated the record
         borrow_management.save()
+        messages.success(request, "Borrow added Successfully")
         return redirect('borrow_list')  # Replace with your actual list view URL name
 
     return render(request, 'office_item/borrow_form.html', {'form': form})
@@ -856,11 +858,18 @@ def borrow_delete(request, borrow_id):
     return redirect('borrow_list')  # Redirect to the list view after deletion 
 
 
+
+
 @user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
 def borrow_list(request):
     # Fetch all BorrowManagement records and order by created_at descending
     borrow_items = BorrowManagement.objects.all().order_by('-created_at')
 
+    # Set up pagination
+    paginator = Paginator(borrow_items, 50)  # Show 10 borrow items per page
+    page_number = request.GET.get('page')  # Get the page number from the query parameters
+    page_obj = paginator.get_page(page_number)  # Get the page object
+
     return render(request, 'office_item/borrow_list.html', {
-        'borrow_items': borrow_items,
+        'page_obj': page_obj,  # Pass page_obj to the template
     })
