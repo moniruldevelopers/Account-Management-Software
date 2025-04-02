@@ -28,7 +28,6 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.admin.models import LogEntry
 from django.utils.safestring import mark_safe
 
-
 @user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
 def upload_users(request):
     if request.method == 'POST':
@@ -251,7 +250,7 @@ def user_list(request):
     admin_users = users.filter(is_staff=True)
     regular_users = users.filter(is_staff=False, is_superuser=False)
 
-    # Pagination for all users
+    # Pagination for all users  
     paginator = Paginator(users, 500)
     page_number = request.GET.get('page')
     users_page = paginator.get_page(page_number)
@@ -797,3 +796,71 @@ def export_transactions_to_excel(user, transactions):
 
 
 
+
+
+# OfficeItem Create/Update View
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
+def office_item_create_or_update(request, office_item_id=None):
+    if office_item_id:
+        office_item = get_object_or_404(OfficeItem, id=office_item_id)
+        form = OfficeItemForm(request.POST or None, instance=office_item)
+    else:
+        form = OfficeItemForm(request.POST or None)
+
+    if form.is_valid():
+        form.save()
+        return redirect('office_item_list')  # Replace with your actual list view URL name
+
+    return render(request, 'office_item/office_item_form.html', {'form': form})
+
+
+
+
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
+def office_item_list(request):
+    items = OfficeItem.objects.all()  # Fetch all office items
+    return render(request, 'office_item/office_item_list.html', {'items': items})
+
+
+# BorrowManagement Create/Update View
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
+def borrow_create_or_update(request, borrow_id=None):
+    if borrow_id:
+        borrow_item = get_object_or_404(BorrowManagement, id=borrow_id)
+        form = BorrowManagementForm(request.POST or None, instance=borrow_item)
+    else:
+        form = BorrowManagementForm(request.POST or None)
+
+    if form.is_valid():
+        borrow_management = form.save(commit=False)
+        borrow_management.created_by = request.user  # Set the user who created/updated the record
+        borrow_management.save()
+        return redirect('borrow_list')  # Replace with your actual list view URL name
+
+    return render(request, 'office_item/borrow_form.html', {'form': form})
+
+
+# OfficeItem Delete View
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
+def office_item_delete(request, office_item_id):
+    office_item = get_object_or_404(OfficeItem, id=office_item_id)
+    office_item.delete()
+    return redirect('office_item_list')  # Redirect to the list view after deletion
+
+
+# BorrowManagement Delete View
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
+def borrow_delete(request, borrow_id):
+    borrow_item = get_object_or_404(BorrowManagement, id=borrow_id)
+    borrow_item.delete()
+    return redirect('borrow_list')  # Redirect to the list view after deletion 
+
+
+@user_passes_test(lambda u: u.is_superuser or u.is_staff, login_url='login')
+def borrow_list(request):
+    # Fetch all BorrowManagement records and order by created_at descending
+    borrow_items = BorrowManagement.objects.all().order_by('-created_at')
+
+    return render(request, 'office_item/borrow_list.html', {
+        'borrow_items': borrow_items,
+    })

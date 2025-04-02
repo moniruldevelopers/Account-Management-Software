@@ -65,3 +65,21 @@ class Transaction(models.Model):
     
     def __str__(self):
         return f"{self.transaction_by} - {self.transaction_type} - {self.price}"
+    
+
+class OfficeItem(models.Model):
+    name = models.CharField(unique=True, max_length=255)
+    description = models.TextField()
+
+    def __str__(self):
+        return self.name
+
+class BorrowManagement(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    office_item = models.ForeignKey(OfficeItem, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    return_date = models.DateTimeField(null=True, blank=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_borrow')
+
+    def __str__(self):
+        return f"{self.office_item.name} borrowed by {self.user.username}"

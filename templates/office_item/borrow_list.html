@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container mt-2">
+        <div class="card shadow-lg p-4">
+
+            <!-- Title Section -->
+            <h2 class="mb-4 text-center">Borrowed Items</h2>
+
+            <!-- Buttons for Adding Borrow and Office Item -->
+            <div class="d-flex justify-content-between mb-3">
+                <a href="{% url 'borrow_create' %}" class="btn btn-success">
+                    <i class="fas fa-plus-circle"></i> Add Borrow
+                </a>
+                <a href="{% url 'office_item_create' %}" class="btn btn-info">
+                    <i class="fas fa-plus-circle"></i> Add Office Item
+                </a>
+            </div>
+
+            <!-- Borrow Management Table -->
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="bg-dark text-white">
+                        <tr>
+                            <th>User</th>
+                            <th>Office Item</th>                        
+                            <th>Created Date</th> <!-- New column for created date -->
+                            <th>Return Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for borrow in borrow_items %}
+                            <tr>
+                                <td>{{ borrow.user.username }} ({{ borrow.user.get_full_name }})</td>
+                                <td>{{ borrow.office_item.name }}</td>
+                                <td>{{ borrow.created_at|date:"d M Y, H:i" }}</td> <!-- Display the created date -->
+
+                                <td>
+                                    {% if borrow.return_date %}
+                                        {{ borrow.return_date|date:"d M Y, H:i" }}
+                                    {% else %}
+                                        <span class="text-muted">Not Returned</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <!-- Edit Button -->
+                                    <a href="{% url 'borrow_edit' borrow.id %}" class="btn btn-warning btn-sm">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+
+                                    <!-- Delete Button -->
+                                    <a href="{% url 'borrow_delete' borrow.id %}" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash-alt"></i> Delete
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

@@ -32,4 +32,19 @@ urlpatterns = [
 
 
 
+    # OfficeItem CRUD URLs
+    path('office-item/create/', office_item_create_or_update, name='office_item_create'),
+    path('office-item/<int:office_item_id>/edit/', office_item_create_or_update, name='office_item_edit'),
+    path('office-item/<int:office_item_id>/delete/', office_item_delete, name='office_item_delete'),
+    path('office-items/', office_item_list, name='office_item_list'),  # List all office items
+
+
+
+    # BorrowManagement CRUD URLs
+    path('borrow/create/', borrow_create_or_update, name='borrow_create'),
+    path('borrow/<int:borrow_id>/edit/', borrow_create_or_update, name='borrow_edit'),
+    path('borrow/<int:borrow_id>/delete/', borrow_delete, name='borrow_delete'),
+    path('borrow-list/', borrow_list, name='borrow_list'),  
+
+
 ]

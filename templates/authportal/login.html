@@ -4,38 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
+    <title>JISC Login Page</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     
     <style>
-
-.message-container {
-    max-width: 600px; /* Adjust the width as needed */
-    margin: 0 auto; /* Center the container */
-    padding: 5px;
-    border: 1px solid #f44336; /* Border color for error messages */
-    background-color: #fdd; /* Light red background */
-    border-radius: 5px; /* Rounded corners */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-}
-
-.message-list {
-    list-style-type: none; /* Remove bullet points */
-    padding: 0;
-    margin: 0;
-}
-
-.message-item {
-    color: #f44336; /* Red text color for error messages */
-    padding: 5px 0; /* Vertical padding */
-    border-bottom: 1px solid #f44336; /* Border between messages */
-}
-
-.message-item:last-child {
-    border-bottom: none; /* Remove border from last message */
-}
-
         .login-background {
             background: url("{% static 'assets/img/jisc.jpg' %}") no-repeat center center fixed;
             background-size: cover;
@@ -57,15 +30,15 @@
             z-index: 1;
         }
         .login-container {
-            width: 100%;
-            max-width: 400px;
-            background-color: rgba(255, 255, 255, 0.87); /* Semi-transparent background */
-            border-radius: 15px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-            padding: 20px;
-            text-align: center;
-            margin: 5px auto;
-            z-index: 2;
+        width: 100%;
+        max-width: 400px;
+        background-color: rgb(255 255 255 / 61%);
+        border-radius: 15px;
+        box-shadow: inset 0 8px 7px 0px rgba(0, 0, 0, 0.2);
+        padding: 20px;
+        text-align: center;
+        margin: 5px auto;
+        z-index: 2;
         }
         .login-header {
             background-color: #001f7f;
@@ -179,18 +152,7 @@
                             <span id="spinner" class="spinner-border spinner-border-sm ml-2" role="status" aria-hidden="true" style="display:none;"></span>
                         </button>
                     </div>
-
                 </form> 
-                <br>
-                {% if messages %}
-                <div class="message-container">
-                <ul class="message-list">
-                {% for message in messages %}
-                <li class="message-item">{{ message }}</li>
-                {% endfor %}
-                </ul>
-                </div>
-                {% endif %}           
             </div>
             
          

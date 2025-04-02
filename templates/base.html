@@ -7,6 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
+    <link rel="icon" type="image/x-icon" href="{% static 'assets/img/fabicon.png' %}">
+
     <title>
         
         {% block title %}
@@ -23,6 +25,12 @@
                 font-weight: bold;
             }
         }
+
+
+
+
+        
+        
     </style>
 </head>
 <body class="sb-nav-fixed">
@@ -42,7 +50,15 @@
                 <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
             </div>
         </form>
-        
+    <!-- Add Transaction and Add Borrow Buttons using Bootstrap's predefined button classes -->
+    <div class="d-inline-flex me-3">
+        <a href="{% url 'add_transaction' %}" class="btn btn-primary me-2">
+            <i class="fas fa-plus-circle"></i> Add Transaction
+        </a>
+        <a href="{% url 'borrow_create' %}" class="btn btn-success">
+            <i class="fas fa-plus-circle"></i> Add Borrow
+        </a>
+    </div>
 
         <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
             <li class="nav-item dropdown">

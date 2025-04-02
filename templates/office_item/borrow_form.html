@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    {% include 'message.html' %}
+    <div class="card shadow-lg p-4">
+        <h4 class="text-center mb-4 p-3 rounded" style="background: linear-gradient(45deg, #007bff, #6610f2); color: white;">
+            {% if form.instance.id %} Edit Borrow Item {% else %} Create Borrow Item {% endif %}
+        </h4>
+        
+        <!-- Form Starts -->
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="row">
+                <!-- Column 1: User -->
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="id_user">User <span class="text-danger">*</span></label>
+                        {{ form.user }}
+                    </div>
+                </div>
+
+                <!-- Column 2: Office Item -->
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="id_office_item">Office Item <span class="text-danger">*</span></label>
+                        {{ form.office_item }}
+                    </div>
+                </div>
+                   <!-- Column 1: Return Date -->
+                   <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="id_return_date">Return Date</label>
+                        {{ form.return_date }}
+                    </div>
+                </div>
+
+              
+            </div>
+
+
+            <div class="text-center mt-3">
+                <button type="submit" class="btn btn-primary w-100">
+                    {% if form.instance.id %} Update Borrow Item {% else %} Create Borrow Item {% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Additional Scripts for Select2 -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // Apply Select2 to office_item and user fields
+        $('#id_user').select2({
+            width: '100%',
+            placeholder: "Search for a user",
+            allowClear: true
+        });
+
+        $('#id_office_item').select2({
+            width: '100%',
+            placeholder: "Search for an office item",
+            allowClear: true
+        });
+    });
+</script>
+
+<style>
+    .card {
+        border-radius: 10px;
+    }
+
+    .form-group label {
+        font-weight: bold;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .select2-container {
+        width: 100% !important; /* Ensures select2 fits within column */
+    }
+
+    .form-control {
+        border-radius: 5px;
+    }
+</style>
+
+{% endblock %}
